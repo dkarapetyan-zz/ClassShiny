@@ -3,7 +3,6 @@
 # author: david karapetyan
 ###############################################################################
 
-# define ui for application that draws a histogram
 shinyUI(
 		fluidPage(
 				

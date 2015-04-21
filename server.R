@@ -4,7 +4,6 @@
 ###############################################################################
 
 library("shiny")
-library("ClassModelForecast")
 
 shinyServer(function(input, output) {
 			
