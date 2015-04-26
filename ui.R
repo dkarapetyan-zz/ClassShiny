@@ -1,6 +1,6 @@
-# todo: createe rshiny version of graph_forecast ui, and deploy
+# TODO: Make book pane into interactive ui--may fix bug
 # 
-# author: david karapetyan
+# Author: David Karapetyan
 ###############################################################################
 
 shinyUI(
@@ -12,7 +12,7 @@ shinyUI(
 				fluidRow(
 						column(3, wellPanel(selectInput(
 												inputId = "bank",
-												label = "Choose a bank to display",
+												label = "Choose a bank to display:",
 												choices = c(
 														"Ally Financial Inc.",
 														"American Express Company",
@@ -46,18 +46,15 @@ shinyUI(
 												label = "Choose a book to display:",
 												choices = c(
 														"Capital",
-														#"PPNR",
+														"PPNR",
 														"AFS",
 														"LLL",
-														#"Loss",
+														"Loss",
 														"NCO"
-#														"Asset Coefficients"
-																),
+												),
 												selected = "Capital"
 										))),
 						column(3, wellPanel(uiOutput("ui"))) 
 				),
-				mainPanel(
-						plotOutput("plot")
-				)
+				mainPanel(plotOutput("plot"))
 		))	

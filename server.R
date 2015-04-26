@@ -3,7 +3,9 @@
 # Author: David Karapetyan
 ###############################################################################
 
-library("shiny")
+require(scales)
+require("ClassModelForecast")
+require("Hmisc")
 
 shinyServer(function(input, output) {
 			
@@ -29,9 +31,12 @@ shinyServer(function(input, output) {
 										selected = "Net Income"),
 								"LLL" = selectInput("dynamic_var", "Choose a variable:",
 										choices = c(
-												#"Total Reserves 000 ",
-												"Provision"),
-										selected = "Provision"),
+												"Total Reserves",
+												"Provision",
+												"Total Net Charge-offs",
+												"4-Qrt Net Charge-offs"	
+										),
+										selected = "Total Reserves"),
 								"AFS" =  selectInput("dynamic_var", "Choose a variable:",
 										choices = c(
 												"Return on AFS Securities",
@@ -56,28 +61,18 @@ shinyServer(function(input, output) {
 												"Loans to Depository Institutions",
 												"Other"),
 										selected = "CI"),
-#								"PPNR" = selectInput("dynamic_var", "Choose a variable:",
-#										choices = c(
-#												"Compensation Noninterest Expense Ratio", 
-#												"Fixed Asset Noninterest Expense Ratio",
-#												"Net Interest Margin",
-#												"Noninterest Nontrading Income Ratio",
-#												"Other Noninterest Expense Ratio",
-#												"Return on Trading Assets"),
-#								selected = "Return on Trading Assets"),
-#								"Asset Coefficients" = selectInput("dynamic_var", "Choose a variable:",
-#										choices = c(
-#												"Net Interest Margin",
-#												"Noninterest Nontrading Income Ratio", 
-#												"Compensation Noninterest Expense Ratio",
-#												"Fixed Asset Noninterest Expense Ratio",
-#												"Other Noninterest Expense Ratio",
-#												"Return on Trading Assets"),
-#								selected = "Net Interest Margin"),
+								"PPNR" = selectInput("dynamic_var", "Choose a variable:",
+										choices = c("Net Interest Income",
+												"Non-Int / Non-Trade Income",
+												"Trading Income", 
+												"Compensation Exp",
+												"Fixed Asset Exp",
+												"Other Exp",
+												"PPNR"),
+										selected = "Return on Trading Assets"),
 								"Loss" =  selectInput("dynamic_var", "Choose a variable:",
 										choices = c(
-												#"4-Qrt Net Charge-offs",
-												#"Agriculture",
+												"Agriculture",
 												"CI", 
 												"Construction Commercial Real Estate",
 												"Credit Card",
@@ -91,30 +86,42 @@ shinyServer(function(input, output) {
 												"NonFarm NonResidential CRE",
 												"Other",
 												"Other Consumer",
-												"Other Real Estate",
-										#"Total Net Charge-offs"
+												"Other Real Estate"
 										),
-										selected = "CI"))
+										selected = "Credit Card")
+						)
 					})
 			
 			
+			plot_data <- reactive({
+						PrepareForPlot(
+								input$book,
+								input$dynamic_var,
+								input$bank,
+								"2014Q3",
+								nco_data,
+								ppnr_data,
+								total_assets,
+								capital_data,
+								model_coefficients_ey,
+								macro_forecasts	
+						)})
+			
+#TODO next two lines cause errors with RShiny. Debug
 			
 			
 			
-			output$plot <- renderPlot(
-					{
-						GraphForecast(
-								book = input$book,
-								variable = input$dynamic_var,
-								bank = input$bank,
-								quarter = "2014Q3",
-								nco_data = nco_data,
-								ppnr_data = ppnr_data,
-								total_assets = total_assets,
-								capital_data = capital_data,
-								model_coefficients = model_coefficients_ey,
-								macro_forecasts = macro_forecasts)
-					}
-			)				
+			output$plot <- renderPlot({
+						p <- ggplot(
+								plot_data(), aes_string(x="Index",
+										y=make.names(input$dynamic_var))
+						)
+						p <- p + ggtitle(paste(input$book, "Forecast"))
+						p <- p + xlab("")
+						p <- p + ylab(input$dynamic_var)
+						p <- p + geom_point()
+						p <- p + stat_smooth(method = loess)
+						p <- p + scale_y_continuous(labels = comma) 	
+						print(p)
+					})
 		})
-
