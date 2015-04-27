@@ -3,9 +3,11 @@
 # Author: David Karapetyan
 ###############################################################################
 
-require(scales)
-require("ClassModelForecast")
-require("Hmisc")
+library(ClassModelForecast)
+library(shiny)
+library(scales)
+library(Hmisc)
+library(zoo)
 
 shinyServer(function(input, output) {
 			
