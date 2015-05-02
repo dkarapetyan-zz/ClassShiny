@@ -3,12 +3,6 @@
 # Author: David Karapetyan
 ###############################################################################
 
-library(ClassModelForecast)
-library(shiny)
-library(scales)
-library(Hmisc)
-library(zoo)
-
 shinyServer(function(input, output) {
 			
 			
